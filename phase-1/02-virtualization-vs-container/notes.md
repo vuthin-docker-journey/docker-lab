@@ -169,8 +169,71 @@ Windows 11
 
 ## ✅ Checklist លំហាត់
 
-- [ ] គូរ diagram VM vs Container ដោយខ្លួនឯង (លើក្រដាស ឬ draw.io)
-- [ ] ឆ្លើយសំណួរ: ហេតុអ្វី container boot លឿនជាង VM?
-- [ ] ឆ្លើយសំណួរ: ហេតុអ្វី container Linux មិនអាច run ផ្ទាល់លើ Windows?
-- [ ] ឆ្លើយសំណួរ: ពេលណាគួរប្រើ VM ជំនួស Container?
-- [ ] Commit: `git commit -m "Phase 1: virtualization vs containerization notes"`
+- [x] គូរ diagram VM vs Container ដោយខ្លួនឯង (លើក្រដាស ឬ draw.io)
+- [x] ឆ្លើយសំណួរ: ហេតុអ្វី container boot លឿនជាង VM?
+- [x] ឆ្លើយសំណួរ: ហេតុអ្វី container Linux មិនអាច run ផ្ទាល់លើ Windows?
+- [x] ឆ្លើយសំណួរ: ពេលណាគួរប្រើ VM ជំនួស Container?
+- [x] Commit: `git commit -m "Phase 1: virtualization vs containerization notes"`
+
+---
+
+# 📝 ចម្លើយ Checklist
+
+## លំហាត់ទី 1: Diagram VM vs Container
+
+```
+        VIRTUAL MACHINE                      CONTAINER
+┌───────────┐ ┌───────────┐      ┌───────┐ ┌───────┐ ┌───────┐
+│   App A   │ │   App B   │      │ App A │ │ App B │ │ App C │
+├───────────┤ ├───────────┤      └───────┘ └───────┘ └───────┘
+│ Guest OS  │ │ Guest OS  │      ┌───────────────────────────┐
+│   (GB!)   │ │   (GB!)   │      │   Docker Engine           │
+└───────────┘ └───────────┘      ├───────────────────────────┤
+┌─────────────────────────┐      │   Host OS (shared kernel) │
+│      Hypervisor         │      ├───────────────────────────┤
+├─────────────────────────┤      │   Physical Server         │
+│      Host OS            │      └───────────────────────────┘
+├─────────────────────────┤
+│   Physical Server       │       Guest OS រៀងខ្លួន → ធ្ងន់, boot យឺត
+└─────────────────────────┘       ចែករំលែក kernel → ស្រាល, boot លឿន
+```
+
+---
+
+## សំណួរទី 1: ហេតុអ្វី Container boot លឿនជាង VM?
+
+**ចម្លើយ:** ព្រោះ Container **មិនត្រូវ boot OS ទេ**។
+
+- **VM boot** = ដំណើរការ Guest OS ពេញលេញ: BIOS/firmware និម្មិត → kernel loading → system services → រួចទើប app ចាប់ផ្តើម។ ដូចបើកកុំព្យូទ័រថ្មីមួយ — ចំណាយពេលរាប់សិបវិនាទីដល់នាទី។
+- **Container start** = គ្រាន់តែ**ចាប់ផ្តើម process ថ្មីមួយ**លើ kernel ដែលកំពុងដំណើរការស្រាប់។ Kernel មិនចាំបាច់ boot ឡើងវិញទេ ព្រោះ Host OS boot រួចហើយ។ លឿនដូចបើក program ធម្មតា — មិល្លីវិនាទីប៉ុណ្ណោះ។
+
+> 🏗️ VM = សាងសង់ផ្ទះថ្មីមុននឹងចូលនៅ / 🔑 Container = ចូលបន្ទប់ apartment ដែលអគារមានស្រាប់
+
+---
+
+## សំណួរទី 2: ហេតុអ្វី Container Linux មិនអាច run ផ្ទាល់លើ Windows?
+
+**ចម្លើយ:** ព្រោះ Container **មិនមាន OS ផ្ទាល់ខ្លួន** — វា**ខ្ចី kernel ពី Host** មកប្រើ។
+
+1. Container Linux ផ្ទុកតែ app + libraries ហើយពឹងផ្អែកលើ **Linux kernel** ដើម្បីហៅ system calls (គ្រប់គ្រង process, memory, network...)
+2. Windows ប្រើ **NT kernel** ដែលមាន system calls ខុសពី Linux ទាំងស្រុង — ដូចនិយាយភាសាខុសគ្នា 🗣️
+3. App ក្នុង container Linux ហៅ Linux system call → NT kernel ស្តាប់មិនយល់ → មិនដំណើរការ
+
+**ដំណោះស្រាយ = WSL2:** Docker Desktop ដាក់ Linux kernel ស្រាលមួយ (VM តូច) ចូលក្នុង Windows ដើម្បីឱ្យ containers Linux មាន kernel ត្រឹមត្រូវប្រើ។
+
+---
+
+## សំណួរទី 3: ពេលណាគួរប្រើ VM ជំនួស Container?
+
+| ស្ថានភាព | ហេតុផល |
+|----------|---------|
+| **ត្រូវការ OS ខុសគ្នា** | ឧ. run Windows Server លើ Linux host — container ធ្វើមិនបានព្រោះចែករំលែក kernel |
+| **ត្រូវការ isolation ខ្លាំងបំផុត** | Banking, multi-tenant hosting — VM បំបែកនៅកម្រិត hardware, សុវត្ថិភាពជាង |
+| **Legacy applications** | Apps ចាស់ៗត្រូវការ OS version ជាក់លាក់ ឬ kernel modules ពិសេស |
+| **ត្រូវការ kernel ផ្ទាល់ខ្លួន** | Testing kernel, drivers, OS-level software |
+| **Compliance/ច្បាប់តម្រូវ** | ធនាគារ, សុខាភិបាល ខ្លះតម្រូវ VM-level isolation |
+
+**ចម្លើយខ្លី:**
+- Container = **ល្បឿន + ស្រាល + portability** (microservices, CI/CD)
+- VM = **isolation ខ្លាំង ឬ OS ខុសគ្នា**
+- ការពិត: ក្រុមហ៊ុនធំៗប្រើ**ទាំងពីរ** — containers run ក្នុង VMs លើ cloud (AWS EC2 = VM → Docker containers ក្នុងនោះ)!
