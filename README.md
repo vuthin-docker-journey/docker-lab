@@ -10,6 +10,8 @@
 
 ## 📍 វឌ្ឍនភាព
 
+> ផែនទីផ្លូវពេញលេញ (ប្រធានបទលម្អិត + រយៈពេល) នៅ [ROADMAP.md](ROADMAP.md)
+
 | Phase | ប្រធានបទ | ស្ថានភាព |
 |:---:|---|:---:|
 | 1 | Linux, VM vs Container, Networking, YAML | ✅ |
@@ -34,15 +36,13 @@ docker-lab/
 │   ├── 02-virtualization-vs-container/notes.md
 │   ├── 03-networking/notes.md
 │   └── 04-yaml/notes.md
+├── ROADMAP.md
 ├── phase-2/
-│   ├── 01-install-and-architecture/notes.md
 │   └── 02-basic-commands/
 │       ├── notes.md
 │       └── project-my-website/        ← project ដំបូង
 │           ├── Dockerfile
-│           ├── index.html
-│           ├── WALKTHROUGH.md
-│           └── LAB-all-features.md
+│           └── index.html
 ├── phase-3/ ...
 ```
 
@@ -64,14 +64,14 @@ docker-lab/
 
 ```bash
 cd phase-2/02-basic-commands/project-my-website
-docker build -t vuthin/my-website:2.0 .
-docker run -d --name mysite -p 8080:80 vuthin/my-website:2.0
+docker build -t vuthin/my-website:2.1 .
+docker run -d --name mysite -p 8080:80 vuthin/my-website:2.1
 # http://localhost:8080
 ```
 
 ឬទាញពី Hub ដោយផ្ទាល់៖
 ```bash
-docker run -d -p 8080:80 vuthin/my-website:2.0
+docker run -d -p 8080:80 vuthin/my-website:2.1
 ```
 
 ---
